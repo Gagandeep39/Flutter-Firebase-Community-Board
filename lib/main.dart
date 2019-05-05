@@ -1,8 +1,7 @@
 import 'package:firebase_app/model/board.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-
 
 void main() => runApp(MyApp());
 
@@ -21,15 +20,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-
   List<Board> boardMessages = List();
   Board board;
   final FirebaseDatabase database = FirebaseDatabase.instance;
@@ -42,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
     board = Board("", "");
     databaseReference = database.reference().child("community_board");
     databaseReference.onChildAdded.listen(_onEntryAdded);
+    databaseReference.onChildChanged.listen(_onEntryChanged);
   }
 
   @override
@@ -57,62 +53,52 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Center(
               child: Form(
                 child: Flex(
-
-              key: formKey,
-                direction: Axis.vertical,
-                children: <Widget>[
-                  ListTile(
-                    leading: Icon(Icons.subject),
-                    title: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: "Enter Subject",
-                        labelText: "Subject"
-
+                  key: formKey,
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.subject),
+                      title: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Subject", labelText: "Subject"),
+                        initialValue: "",
+                        onSaved: (val) => board.subject = val,
+                        validator: (val) => val == "" ? val : null,
                       ),
-                      initialValue: "",
-                      onSaved: (val)=>board.subject = val,
-                      validator: (val) => val == ""? val : null,
                     ),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.message),
-                    title: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: "Enter Message",
-                        labelText: "Message"
+                    ListTile(
+                      leading: Icon(Icons.message),
+                      title: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Message", labelText: "Message"),
+                        initialValue: "",
+                        onSaved: (val) => board.body = val,
+                        validator: (val) => val == "" ? val : null,
                       ),
-                      initialValue: "",
-                      onSaved: (val)=>board.body = val,
-                      validator: (val) => val == ""? val : null,
                     ),
-                  ),
-
-                  RaisedButton(
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    child: Text("Post"),
-                    onPressed: (){
-                      handleSubmit();
-                    },
-                  ),
-
-                ],
-                )
-              ),
+                    RaisedButton(
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      child: Text("Post"),
+                      onPressed: () {
+                        handleSubmit();
+                      },
+                    ),
+                  ],
+                )),
             ),
           ),
-
           Flexible(
             child: FirebaseAnimatedList(
               physics: BouncingScrollPhysics(),
               query: databaseReference,
-              itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation animation, int index) {
+              itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                Animation animation, int index) {
                 return Card(
                   margin: EdgeInsets.only(right: 8.0, left: 8.0, bottom: 4.0),
                   borderOnForeground: true,
                   child: ListTile(
-
-                    onTap: (){},
+                    onTap: () {},
                     leading: CircleAvatar(
                       backgroundColor: Colors.blue,
                     ),
@@ -128,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void  _onEntryAdded(Event event) {
+  void _onEntryAdded(Event event) {
     setState(() {
       boardMessages.add(Board.fromSnapshot(event.snapshot));
     });
@@ -136,11 +122,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   handleSubmit() {
     final FormState form = formKey.currentState;
-    if(form.validate()){  //save form data to database
+    if (form.validate()) {
+      //save form data to database
       form.save();
       form.reset();
 //      databaseReference.child(board.subject).set(board.toJson());   //will overwrite current data if same key (subject) is already present in firebase
-      databaseReference.push().set(board.toJson());   //will generate a random parent key
+      databaseReference
+        .push()
+        .set(board.toJson()); //will generate a random parent key
     }
+  }
+
+  void _onEntryChanged(Event event) {
+    //a listener to data updation, and the event of listener is passed
+    var oldEntry = boardMessages.singleWhere((entry) {
+      //will look for current data and find it in firebase, if match found then store in oldEntry
+      return entry.key == event.snapshot.key;
+    });
+
+    setState(() {
+      //data of the listener's event is stored in oldIndex of board message
+      boardMessages[boardMessages.indexOf(oldEntry)] =
+        Board.fromSnapshot(event.snapshot);
+    });
   }
 }
