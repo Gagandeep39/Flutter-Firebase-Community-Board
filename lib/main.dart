@@ -54,9 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Flexible(
             flex: 0,
-            child: Form(
+            child: Center(
+              child: Form(
+                child: Flex(
+
               key: formKey,
-              child: Flex(
                 direction: Axis.vertical,
                 children: <Widget>[
                   ListTile(
@@ -95,16 +97,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
 
                 ],
+                )
               ),
             ),
           ),
 
           Flexible(
             child: FirebaseAnimatedList(
+              physics: BouncingScrollPhysics(),
               query: databaseReference,
               itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation animation, int index) {
                 return Card(
+                  margin: EdgeInsets.only(right: 8.0, left: 8.0, bottom: 4.0),
+                  borderOnForeground: true,
                   child: ListTile(
+
+                    onTap: (){},
                     leading: CircleAvatar(
                       backgroundColor: Colors.blue,
                     ),
