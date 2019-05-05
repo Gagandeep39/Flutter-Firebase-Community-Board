@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "321214862687",
+    "firebase_url": "https://flutter-intro-setup-gagan.firebaseio.com",
+    "project_id": "flutter-intro-setup-gagan",
+    "storage_bucket": "flutter-intro-setup-gagan.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321214862687:android:972c3005d3d932c5",
+        "android_client_info": {
+          "package_name": "com.gagandeep.firebase_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321214862687-agnbbieh0rg6b72rn1oe4050mamtlgqf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "Search on Google Keep"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "321214862687-agnbbieh0rg6b72rn1oe4050mamtlgqf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
